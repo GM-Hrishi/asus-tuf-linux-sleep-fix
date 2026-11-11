@@ -1,0 +1,11 @@
+[Unit]
+Description=Re-enable the dGPU at shutdown so the next OS (Windows) boots with it on
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+ExecStop=-/usr/local/sbin/gpu-set on
+
+[Install]
+WantedBy=multi-user.target

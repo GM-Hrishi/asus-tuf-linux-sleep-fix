@@ -1,0 +1,21 @@
+#!/bin/sh
+# Root helper: the only thing the passwordless sudo rule allows.
+#   gpu-set on       set the firmware flag to "dGPU enabled" (used at shutdown)
+#   gpu-set on-load  enable, then load the NVIDIA driver (used by the toggle)
+#   gpu-set off      set the firmware flag to "dGPU disabled"
+A1=/sys/class/firmware-attributes/asus-armoury/attributes/dgpu_disable/current_value
+A2=/sys/devices/platform/asus-nb-wmi/dgpu_disable
+if [ -w "$A1" ]; then
+    ATTR="$A1"
+elif [ -w "$A2" ]; then
+    ATTR="$A2"
+else
+    echo "gpu-set: no dgpu_disable interface found" >&2
+    exit 1
+fi
+case "$1" in
+    on)      echo 0 > "$ATTR" ;;
+    on-load) echo 0 > "$ATTR"; sleep 2; modprobe nvidia >/dev/null 2>&1 || true ;;
+    off)     echo 1 > "$ATTR" ;;
+    *)       echo "usage: gpu-set on|on-load|off" >&2; exit 2 ;;
+esac

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Shows the dGPU state and asks before flipping it (either direction).
+A1=/sys/class/firmware-attributes/asus-armoury/attributes/dgpu_disable/current_value
+A2=/sys/devices/platform/asus-nb-wmi/dgpu_disable
+T="GPU Toggle"
+
+ATTR=""
+for p in "$A1" "$A2"; do
+    [ -r "$p" ] && { ATTR="$p"; break; }
+done
+if [ -z "$ATTR" ]; then
+    zenity --error --title "$T" --text "No ASUS dgpu_disable interface found (kernel too old, or not an ASUS laptop)."
+    exit 1
+fi
+
+if [ "$(cat "$ATTR")" = "0" ]; then
+    # GPU is ON -> ask before disabling
+    busy=$(for p in $(fuser /dev/nvidia[0-9]* 2>/dev/null); do ps -p "$p" -o comm=; done \
+           | grep -v nvidia-persistenced | sort -u)
+    msg=$'RTX dGPU is currently ON.\n\nDisable it (integrated GPU only)?'
+    [ -n "$busy" ] && msg+=$'\n\nWarning, in use by:\n'"$busy"
+    zenity --question --title "$T" --text "$msg" --ok-label "Disable" --cancel-label "Keep ON" || exit 0
+    sudo -n /usr/local/sbin/gpu-set off
+    sleep 1
+    if [ "$(cat "$ATTR")" = "1" ]; then
+        notify-send "$T" "dGPU disabled (iGPU only)"
+    else
+        notify-send "$T" "Failed to disable the GPU"
+    fi
+else
+    # GPU is OFF -> ask before enabling
+    zenity --question --title "$T" --text $'dGPU is currently OFF (integrated GPU only).\n\nEnable it?' \
+           --ok-label "Enable" --cancel-label "Keep OFF" || exit 0
+    sudo -n /usr/local/sbin/gpu-set on-load
+    ok=0
+    for _ in $(seq 1 15); do
+        nvidia-smi -L >/dev/null 2>&1 && { ok=1; break; }
+        sleep 1
+    done
+    if [ "$ok" = 1 ]; then
+        notify-send "$T" "dGPU enabled"
+    else
+        notify-send "$T" "Flag is ON but the driver doesn't see the GPU yet. Run: nvidia-smi -L"
+    fi
+fi
