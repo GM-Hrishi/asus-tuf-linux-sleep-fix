@@ -75,7 +75,9 @@ If it shows `[deep]`, add `mem_sleep_default=s2idle` to `GRUB_CMDLINE_LINUX_DEFA
 
 ## Part 2: GPU Toggle (turn the NVIDIA GPU on/off from Ubuntu)
 
-![GPU Toggle confirmation dialog](docs/images/gpu-toggle-dialog.jpg)
+![GPU Toggle: disable prompt, listing programs using the GPU](docs/images/gpu-toggle-dialog.jpg)
+
+![GPU Toggle: enable prompt when the GPU is off](docs/images/gpu-toggle-dialog-off.jpg)
 
 ### What it does
 
