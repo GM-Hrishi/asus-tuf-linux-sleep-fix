@@ -1,4 +1,4 @@
-# ASUS TUF F15 on Linux: Suspend/Wake Fix + GPU Toggle
+# ASUS TUF F15 (FX507VV) on Linux: Suspend/Wake Fix + GPU Toggle
 
 Two fixes for running Ubuntu (or another Linux) on an **ASUS TUF F15** with an NVIDIA GPU and a MUX switch:
 
@@ -75,6 +75,8 @@ If it shows `[deep]`, add `mem_sleep_default=s2idle` to `GRUB_CMDLINE_LINUX_DEFA
 
 ## Part 2: GPU Toggle (turn the NVIDIA GPU on/off from Ubuntu)
 
+![GPU Toggle confirmation dialog](docs/images/gpu-toggle-dialog.jpg)
+
 ### What it does
 
 * Adds a **GPU Toggle** icon to your app grid (pin it to the dock).
@@ -135,6 +137,17 @@ In Windows, set Armoury Crate to **Standard**. If Armoury Crate is saved in **Ec
 * [docs/nvidia-suspend-settings.md](docs/nvidia-suspend-settings.md) – the NVIDIA/GRUB settings that gave working suspend and wake with the GPU on.
 * [docs/troubleshooting.md](docs/troubleshooting.md) – missing NVIDIA module after a kernel update, `nvidia-smi` showing no devices, Windows turning the GPU off, wake fix not applying.
 
+## Tried it on a different model? Please report
+
+Open an issue and include:
+
+* the output of `cat /sys/class/dmi/id/product_name`
+* your Ubuntu version and kernel (`uname -r`)
+* the output of `grep LID0 /proc/acpi/wakeup` before and after the fix
+* whether suspend and wake worked afterwards
+
+That is how this repo learns which other TUF models the fix works on.
+
 ## Repo layout
 
 ```
@@ -142,9 +155,9 @@ ssdt-lidwake.asl     ACPI patch source
 install.sh           sleep-fix installer
 uninstall.sh         sleep-fix uninstaller
 gpu-toggle/          GPU Toggle app (helper, UI script, service, installer)
-docs/                NVIDIA settings and troubleshooting
+docs/                NVIDIA settings, troubleshooting, screenshots
 ```
 
 ## Keywords
 
-asus tuf f15 ubuntu suspend fix, asus tuf won't wake up from sleep linux, asus tuf modern standby wake bug, acpi wakeup LID0 _PRW s2idle, asus tuf f15 enable disable nvidia gpu ubuntu, asus eco mode linux, dgpu_disable asus-armoury.
+asus tuf f15 fx507vv ubuntu suspend fix, asus tuf won't wake up from sleep linux, asus tuf modern standby wake bug, acpi wakeup LID0 _PRW s2idle, asus tuf f15 enable disable nvidia gpu ubuntu, asus eco mode linux, dgpu_disable asus-armoury.
